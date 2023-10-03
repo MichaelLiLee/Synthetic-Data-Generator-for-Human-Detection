@@ -1,7 +1,60 @@
-"""HumanSDGParameter 
-"""
-
 class HumanSDGParameter:
+    """ A configuration class to configure this blender-based synthetic data generator pipeline.
+
+    Attributes
+    ----------
+    gen_num (int): The quantity of synthetic images needed to be generated.
+    blender_exe_path (str): The path to the blender executable[1].
+    asset_background_object_folder_path (str): The path to background object assets.
+    asset_foreground_object_folder_path (str): The path to foreground object assets.
+    asset_occluder_folder_path (str): The path to occlusion object assets.
+    asset_ambientCGMaterial_folder_path (str): The path to the downloaded ambientCG PBR materials.
+    asset_hdri_lighting_folder_path (str): The path to the downloaded Poly Haven HDRIs.
+    asset_animation_folder_path (str): The path to the animation assets directory.
+    output_img_path (str): The path where rendered images will be saved.
+    output_annotation_path (str): The path where MSCOCO format bounding box and skeleton keypoints annotations will be saved.
+    background_poisson_disk_sampling_radius (float): Background objects separation distance.
+    num_foreground_object_in_scene_range (dict of str: int): The distribution of the number of virtual humans within the blender scene.
+    foreground_area (list of float): Spatial distribution area of foreground objects.
+    foreground_poisson_disk_sampling_radius (float): Foreground objects separation distance.
+    num_occluder_in_scene_range (dict of str: int): The distribution of the number of occlusion objects within the blender scene.
+    occluder_area (list of float): Spatial distribution area of occlusion objects.
+    occluder_poisson_disk_sampling_radius (float): Occlusion objects separation distance.
+    bg_obj_scale_ratio_range (dict of str: float): The distribution of the scale ratio of background objects within the blender scene.
+    fg_obj_scale_ratio_range (dict of str: float): The distribution of the scale ratio of foreground objects within the blender scene.
+    occluder_scale_ratio_range (dict of str: float): The distribution of the scale ratio of occluder objects within the blender scene.
+    hdri_lighting_strength_range (dict of str: float): The distribution of the strength factor for the intensity of the HDRI scene light.
+    camera_focal_length (int): Perspective Camera focal length value in millimeters.
+    img_resolution_x (int): Number of horizontal pixels in the rendered image.
+    img_resolution_y (int): Number of vertical pixels in the rendered image.
+    max_samples (int): Number of samples to render for each pixel.
+    chromatic_aberration_probability (float): Probability of chromatic aberration effect being enabled.
+    blur_probability (float): Probability of blur effect being enabled.
+    motion_blur_probability (float): Probability of motion blur effect being enabled.
+    exposure_probability (float): Probability of exposure adjustment being enabled.
+    noise_probability (float): Probability of noise effect being enabled.
+    white_balance_probability (float): Probability of white balance adjustment being enabled.
+    brightness_probability (float): Probability of brightness adjustment being enabled.
+    contrast_probability (float): Probability of contrast adjustment being enabled.
+    hue_probability (float): Probability of hue adjustment being enabled.
+    saturation_probability (float): Probability of saturation adjustment being enabled.
+    chromatic_aberration_value_range (dict of str: float): The distribution of the value of Lens Distortion nodes input-Dispersion, which simulates chromatic aberration.
+    blur_value_range (dict of str: float): The distribution of the value of Blur nodes input-Size, which controls the blur radius values.
+    motion_blur_value_range (dict of str: float): The distribution of the value of Vector Blur nodes input-Speed, which controls the direction of motion.
+    exposure_value_range (dict of str: float): The distribution of the value of Exposure nodes input-Exposure, which controls the scalar factor to adjust the exposure.
+    noise_value_range (dict of str: float): The distribution of the value of brightness of the noise texture.
+    white_balance_value_range (dict of str: float): The distribution of the value of WhiteBalanceNode input-ColorTemperature, which adjust the color temperature.
+    brightness_value_range (dict of str: float): The distribution of the value of Bright/Contrast nodes input-Bright, which adjust the brightness.
+    contrast_value_range (dict of str: float): The distribution of the value of Bright/Contrast nodes input-Contrast, which adjust the contrast.
+    hue_value_range (dict of str: float): The distribution of the value of Hue Saturation Value nodes input-Hue, which adjust the hue.
+    saturation_value_range (dict of str: float): The distribution of the value of Hue Saturation Value nodes input-Saturation, which adjust the saturation.
+
+    References
+    ----------
+    [1]https://docs.blender.org/manual/en/latest/advanced/blender_directory_layout.html
+
+    """
+    
     def __init__(self):
         self.gen_num = 400
         self.blender_exe_path = "C:/program Files/Blender Foundation/Blender 3.3/blender"

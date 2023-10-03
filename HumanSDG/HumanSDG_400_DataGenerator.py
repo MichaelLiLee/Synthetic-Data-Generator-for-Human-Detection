@@ -1,13 +1,4 @@
-""" DataGenerator
-
-reference:
-## prevent create __pycache__ file
-https://stackoverflow.com/questions/50752302/python3-pycache-generating-even-if-pythondontwritebytecode-1
-## Update view layer
-https://blender.stackexchange.com/questions/140789/what-is-the-replacement-for-scene-update
-"""
-
-## add SynthDet related python files path to system path
+# Add HumanSDG related python files path to system path
 import sys
 import os
 module_path = os.path.dirname(os.path.abspath(__file__))
@@ -16,7 +7,7 @@ for p in sys.path:
     sys_path_list.append(p)
 if module_path not in sys_path_list:
     sys.path.append(module_path)
-## prevent create __pycache__ file
+# Prevent create __pycache__ file
 sys.dont_write_bytecode = True
 
 import bpy 
@@ -34,12 +25,25 @@ from HumanSDG_100_CameraRandomizer import CameraRandomizer
 from HumanSDG_200_MSCOCOLabeler_IDMask import MSCOCOLabeler
 from HumanSDG_300_HumanSDGParameter import HumanSDGParameter
 
+
 class DataGenerator:
     
     def gen_one_data(self):
         """ 
+        A class that instantiates all components of the Synthetic Data Generation (SDG) process, updates instance attributes, 
+        and then calls methods in a specific sequence to complete the entire process of generating synthetic data.
+
+        Methods
+        -------
+        gen_one_data(): Generates one synthetic data.
+
+        References
+        ----------
+        [1]prevent create __pycache__ file, https://stackoverflow.com/questions/50752302/python3-pycache-generating-even-if-pythondontwritebytecode-1
+        [2]Update view layer, https://blender.stackexchange.com/questions/140789/what-is-the-replacement-for-scene-update
+        
         """ 
-        ## component initialize
+        # Component initialize
         initializer = Initializer()
         parameter = HumanSDGParameter()
         initializer.camera_focal_length = parameter.camera_focal_length
@@ -60,7 +64,7 @@ class DataGenerator:
 
         print("Component Initialize Completed!!!")
 
-        ## passing params
+        # Passing params
         background_object_placement_randomizer.background_poisson_disk_sampling_radius = parameter.background_poisson_disk_sampling_radius
         background_object_placement_randomizer.asset_background_object_folder_path = parameter.asset_background_object_folder_path
         foreground_object_placement_randomizer.num_foreground_object_in_scene_range = parameter.num_foreground_object_in_scene_range
@@ -102,7 +106,7 @@ class DataGenerator:
         mscoco_annotation_labeler.output_img_path = parameter.output_img_path
         mscoco_annotation_labeler.output_annotation_path = parameter.output_annotation_path
 
-        ## main data generate flow
+        # Main data generate flow
         background_object_placement_randomizer.background_object_placement_randomize()
         foreground_object_placement_randomizer.foreground_object_placement_randomize()
         occluder_placement_randomizer.occluder_placement_randomize()
@@ -113,11 +117,12 @@ class DataGenerator:
         animation_randomizer.animation_randomize()
         camera_randomizer.camera_randomize()
         light_randomizer.light_randomize()
-        bpy.data.scenes["Scene"].view_layers.update()## Update view layer
+        bpy.data.scenes["Scene"].view_layers.update() # Update view layer[2]
         mscoco_annotation_labeler.auto_labeling()
 
         print("One Data Generating Cylce Completed!!!")
         sys.exit()
+
 
 if __name__ == '__main__':
     datagen = DataGenerator()
