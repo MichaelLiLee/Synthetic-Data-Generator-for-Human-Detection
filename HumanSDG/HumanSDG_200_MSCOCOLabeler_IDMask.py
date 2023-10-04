@@ -18,46 +18,46 @@ class MSCOCOLabeler:
     ----------
     output_img_path (str): The path where rendered images will be saved.
     output_annotation_path (str): The path where MSCOCO format bounding box and skeleton keypoints annotations will be saved.
-    __scene (bpy.types.Scene): 
-    __camera (bpy.types.Camera): 
-    __clip_start (bpy.types.Camera): 
-    __clip_end (bpy.types.Camera): 
-    __target_obj_collections (list of bpy.types.Collection): 
-    __armature_object_list (list of bpy.types.Armature): 
-    __armature_can_see_list (list of bpy.types.Armature): 
-    __keypoint_can_see_list (list of bpy.types.Armature & bpy.types.PoseBone & bpy.types.Bone): 
-    __armature_annotation_list (list of bpy.types.Armature & dict): 
-    __rig_obj_and_id_dict (dict of bpy.types.Armature: int): 
-    __rig_obj_and_parent_mesh_obj_dict (dict of bpy.types.Armature: list of bpy.types.Mesh): 
-    __minimum_armature_pixel (int): 
-    __minimum_keypoint_num (int): 
+    __scene (bpy.types.Scene): The blender scene data-block of current virtual environment.
+    __camera (bpy.types.Camera): The blender camera data-block.
+    __clip_start (bpy.types.Camera): Camera near clipping distance.
+    __clip_end (bpy.types.Camera): Camera far clipping distance.
+    __target_obj_collections (list of bpy.types.Collection): The collection that needs extract bounding box and skeleton keypoints annotation from its containing virtual human objects.
+    __armature_object_list (list of bpy.types.Armature): List of armature objects in current blender scene.
+    __armature_can_see_list (list of bpy.types.Armature): List of armature objects visible in the camera view in the current Blender scene.
+    __keypoint_can_see_list (list of bpy.types.Armature & bpy.types.PoseBone & bpy.types.Bone): List of armature bone joints visible in the camera view in the current Blender scene.
+    __armature_annotation_list (list of bpy.types.Armature & dict): List of virtual human objects and their corresponding annotation data.
+    __rig_obj_and_id_dict (dict of bpy.types.Armature: int): List of virtual human objects and their corresponding ID number.
+    __rig_obj_and_parent_mesh_obj_dict (dict of bpy.types.Armature: list of bpy.types.Mesh): List of armature objects and their corresponding mesh objects.
+    __minimum_armature_pixel (int): Filter armature objects based on the minimum number of pixels.
+    __minimum_keypoint_num (int): Filter armature objects based on the minimum number of keypoints in camera view.
     __gen_img_id (str): ID of generated synthetic image data.
     __render_machine_id (str): ID of rendering PC.
-    __keypoint_bone_mapping_dict (dict of str: list fo str): 
-    __reference_bbox_value_dict (dict of str: int): 
-    __default_keypoint_value_dict (dict of str: list fo int): 
-    __reference_mscoco_json_format (dict of mscoco annotations, COCO data format https://cocodataset.org/#format-data): 
-    __default_mscoco_json_format (dict of mscoco annotations): 
-    __default_mscoco_annotations_part_dict (dict of part mscoco annotations): 
-    __output_mscoco_json_dict (dict of mscoco annotations): 
+    __keypoint_bone_mapping_dict (dict of str: list fo str): Mapping between mscoco 17 keypoints name and their corresponding blender bone joint name.
+    __reference_bbox_value_dict (dict of str: int): Reference of mscoco object detection task annotation "bbox" format.
+    __default_keypoint_value_dict (dict of str: list fo int): Default keypoint names[str] and value[x1,y1,v1,...] of mscoco keypoint annotation.
+    __reference_mscoco_json_format (dict of mscoco annotations): Reference of mscoco data format https://cocodataset.org/#format-data
+    __default_mscoco_json_format (dict of mscoco annotations): Default mscoco data format.
+    __default_mscoco_annotations_part_dict (dict of part mscoco annotations): Default mscoco data "annotations" format.
+    __output_mscoco_json_dict (dict of mscoco annotations): Dict to store generated annotation data.
 
     Methods
     -------
     __create_gen_img_id(): Create a unique ID for generated synthetic image data.
-    __get_all_armature_object_in_target_obj_collections(): 
-    __create_and_switch_annotation_scene(): 
+    __get_all_armature_object_in_target_obj_collections(): Retrieve all armature objects from the Blender collection named "__target_obj_collections".
+    __create_and_switch_annotation_scene(): Copy current Blender scene for annotation/labeling purpose and switch to the copy scene.
     __create_id_mask_nodes(): Create ID Mask Node for annotation/labeling purpose.
     __add_pass_index(): Add index number for the "Object Index" render pass.
     __annotation_render(): Render image for annotation/labeling purpose.
-    __get_all_armature_can_see(): 
-    __get_all_keypoint_can_see(): 
-    __get_keypoint_global_coordinate(): 
-    __check_keypoint_in_cam_view(): 
-    __get_bbox_image_coordinates(): 
-    __get_keypoint_image_coordinates(): 
-    __get_key_from_value(): 
-    __get_all_armature_annotation(): 
-    __convert_to_mscoco_format(): 
+    __get_all_armature_can_see(): Retrieve all armature objects from the Blender scene that are visible in the camera view.
+    __get_all_keypoint_can_see(): Retrieve the names of all armature bone joints from the Blender scene that are visible in the camera view.
+    __get_keypoint_global_coordinate(): Get armature bone joint global coordinates in current Blender scene.
+    __check_keypoint_in_cam_view(): Check if the armature bone joint is visible in the camera view.
+    __get_bbox_image_coordinates(): Retrieve data for the image coordinates of the bounding box of the virtual human object.
+    __get_keypoint_image_coordinates(): Retrieve data for the image coordinates of the skeleton keypoint of the virtual human object.
+    __get_key_from_value(): Find dictionary key name based on its corresponding value.
+    __get_all_armature_annotation(): Retrieve all annotation data from virtual human objects that are visible in the camera view.
+    __convert_to_mscoco_format(): Convert all annotation data to MSCOCO format.
     __render_img_and_save_annotation(): Render the image and generate the corresponding annotation/labeling data.
     auto_labeling(): Main process for rendering and labeling data.
 
@@ -469,6 +469,7 @@ class MSCOCOLabeler:
         self.__convert_to_mscoco_format()
         self.__render_img_and_save_annotation()
         print("Auto Labeling COMPLERED !!!")
+
 
 if __name__ == "__main__":
 
