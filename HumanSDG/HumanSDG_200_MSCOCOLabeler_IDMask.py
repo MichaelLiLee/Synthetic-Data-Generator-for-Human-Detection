@@ -20,12 +20,12 @@ class MSCOCOLabeler:
     output_annotation_path (str): The path where MSCOCO format bounding box and skeleton keypoints annotations will be saved.
     __scene (bpy.types.Scene): The blender scene data-block of current virtual environment.
     __camera (bpy.types.Camera): The blender camera data-block.
-    __clip_start (bpy.types.Camera): Camera near clipping distance.
-    __clip_end (bpy.types.Camera): Camera far clipping distance.
+    __clip_start (float): Camera near clipping distance.
+    __clip_end (float): Camera far clipping distance.
     __target_obj_collections (list of bpy.types.Collection): The collection that needs extract bounding box and skeleton keypoints annotation from its containing virtual human objects.
     __armature_object_list (list of bpy.types.Armature): List of armature objects in current blender scene.
     __armature_can_see_list (list of bpy.types.Armature): List of armature objects visible in the camera view in the current Blender scene.
-    __keypoint_can_see_list (list of bpy.types.Armature & bpy.types.PoseBone & bpy.types.Bone): List of armature bone joints visible in the camera view in the current Blender scene.
+    __keypoint_can_see_list (list of bpy.types.Armature & bpy.types.PoseBone & str): List of armature bone joints visible in the camera view in the current Blender scene.
     __armature_annotation_list (list of bpy.types.Armature & dict): List of virtual human objects and their corresponding annotation data.
     __rig_obj_and_id_dict (dict of bpy.types.Armature: int): List of virtual human objects and their corresponding ID number.
     __rig_obj_and_parent_mesh_obj_dict (dict of bpy.types.Armature: list of bpy.types.Mesh): List of armature objects and their corresponding mesh objects.
@@ -36,10 +36,10 @@ class MSCOCOLabeler:
     __keypoint_bone_mapping_dict (dict of str: list fo str): Mapping between mscoco 17 keypoints name and their corresponding blender bone joint name.
     __reference_bbox_value_dict (dict of str: int): Reference of mscoco object detection task annotation "bbox" format.
     __default_keypoint_value_dict (dict of str: list fo int): Default keypoint names[str] and value[x1,y1,v1,...] of mscoco keypoint annotation.
-    __reference_mscoco_json_format (dict of mscoco annotations): Reference of mscoco data format https://cocodataset.org/#format-data
-    __default_mscoco_json_format (dict of mscoco annotations): Default mscoco data format.
-    __default_mscoco_annotations_part_dict (dict of part mscoco annotations): Default mscoco data "annotations" format.
-    __output_mscoco_json_dict (dict of mscoco annotations): Dict to store generated annotation data.
+    __reference_mscoco_json_format (dict): Reference of mscoco data format https://cocodataset.org/#format-data
+    __default_mscoco_json_format (dict): Default mscoco data format.
+    __default_mscoco_annotations_part_dict (dict): Default mscoco data "annotations" format.
+    __output_mscoco_json_dict (dict): Dict to store generated annotation data.
 
     Methods
     -------
@@ -145,8 +145,7 @@ class MSCOCOLabeler:
 
 
     def __create_gen_img_id(self):
-        """ 
-        """
+        """Create a unique ID for generated synthetic image data."""
         now = datetime.datetime.now(tz=datetime.timezone(datetime.timedelta(hours=8)))
         time_id = now.strftime("%Y%m%d%H%M%S").zfill(15)
         render_machine_id = self.__render_machine_id
@@ -154,8 +153,7 @@ class MSCOCOLabeler:
 
 
     def __get_all_armature_object_in_target_obj_collections(self):
-        """ 
-        """ 
+        """Retrieve all armature objects from the Blender collection named "__target_obj_collections".""" 
         for collection in self.__target_obj_collections:
             for target_obj in collection.objects:
                 if target_obj.type == "ARMATURE":
@@ -163,8 +161,7 @@ class MSCOCOLabeler:
 
 
     def __create_and_switch_annotation_scene(self):
-        """
-        """
+        """Copy current Blender scene for annotation/labeling purpose and switch to the copy scene."""
         scene_list = []
         for scene in bpy.data.scenes:
             scene_list.append(scene.name)
@@ -177,8 +174,7 @@ class MSCOCOLabeler:
 
 
     def  __create_id_mask_nodes(self):
-        """ 
-        """
+        """Create ID Mask Node for annotation/labeling purpose."""
         # Active compositing nodes
         bpy.data.scenes['Scene_Annot'].use_nodes = True
 
@@ -206,8 +202,7 @@ class MSCOCOLabeler:
 
 
     def __add_pass_index(self):
-        """ 
-        """ 
+        """Add index number for the "Object Index" render pass.""" 
         bpy.data.scenes['Scene_Annot'].view_layers["ViewLayer"].use_pass_object_index = True
       
         for index, rig_obj in enumerate(self.__armature_object_list, start=1):
@@ -224,8 +219,7 @@ class MSCOCOLabeler:
 
 
     def __annotation_render(self):
-        """ 
-        """
+        """Render image for annotation/labeling purpose."""
         # Render using Cycle
         bpy.data.scenes['Scene_Annot'].render.engine = "CYCLES"
         bpy.data.scenes['Scene_Annot'].cycles.device = "GPU"
@@ -237,8 +231,7 @@ class MSCOCOLabeler:
 
 
     def __get_all_armature_can_see(self):
-        """ 
-        """ 
+        """Retrieve all armature objects from the Blender scene that are visible in the camera view.""" 
         self.__annotation_render()
         for armature_obj, id in self.__rig_obj_and_id_dict.items():
             print(f'armature_obj, id : {armature_obj}, {id}')
@@ -262,10 +255,13 @@ class MSCOCOLabeler:
 
 
     def __get_all_keypoint_can_see(self):
-        """ 
-        update __self.keypoint_can_see_list
-        return : [[armature object,[[pose_bone_name1,joint_name1],[pose_bone_name2,joint_name2]]],
-                    [armature object2,[[pose_bone_name1,joint_name1],[pose_bone_name2,joint_name2]]],]
+        """Retrieve the names of all armature bone joints from the Blender scene that are visible in the camera view. 
+
+        This function will update attribute named "__self.keypoint_can_see_list".
+
+        Update format : [[armature object,[[pose_bone_name1,joint_name1],[pose_bone_name2,joint_name2]]],
+                        [armature object2,[[pose_bone_name1,joint_name1],[pose_bone_name2,joint_name2]]],...]
+
         """ 
         for armature in self.__armature_can_see_list:
 
@@ -288,7 +284,16 @@ class MSCOCOLabeler:
 
 
     def __get_keypoint_global_coordinate(self, armature_object, pose_bone, bone_joint):
-        """
+        """Get armature bone joint global coordinates in current Blender scene.
+
+        Args:
+            armature_object (bpy.types.Armature): Armature object that require coordinate conversion.
+            pose_bone (bpy.types.PoseBone): Armature Bone that require coordinate conversion.
+            bone_joint (str): Armature bone joint names that require coordinate conversion.
+
+        Return:
+            global_coordinate_list (list of float): Armature bone joint global coordinates.
+
         """
         #print(f'Armature name : {armature_object.name} / ', f'Pose Bone name : {pose_bone.name} / ', f'Bone Joint : {bone_joint}')
         global_coordinate_vector = armature_object.matrix_world @ getattr(pose_bone, bone_joint)
@@ -298,7 +303,11 @@ class MSCOCOLabeler:
 
 
     def __check_keypoint_in_cam_view(self, keypoint_global_coordinate: list):
-        """
+        """Check if the armature bone joint is visible in the camera view.
+
+        Args:
+            keypoint_global_coordinate (list of float): Armature bone joint global coordinates.
+
         """
         # World space to ndc space
         vector_p = Vector(keypoint_global_coordinate)
@@ -311,8 +320,14 @@ class MSCOCOLabeler:
 
 
     def __get_bbox_image_coordinates(self, armature_object):
-        """ 
-        return:bbox_value_dict
+        """Retrieve data for the image coordinates of the bounding box of the virtual human object.
+
+        Args:
+            armature_object (bpy.types.Armature): Armature object need to retrieve bounding box annotation data.
+
+        Return:
+        bbox_value_dict (dict of str: int): Bounding box top left image coordinate and box width、height information.
+
         """ 
         print(f"find {armature_object.name} bbox") 
 
@@ -341,8 +356,7 @@ class MSCOCOLabeler:
 
 
     def __get_keypoint_image_coordinates(self, armature_object, pose_bone, bone_joint):
-        """ 
-        """ 
+        """Retrieve data for the image coordinates of the skeleton keypoint of the virtual human object.""" 
         # World space to ndc space
         keypoint_global_coordinate = self.__get_keypoint_global_coordinate(armature_object, pose_bone, bone_joint)
         vector_p = Vector(keypoint_global_coordinate)
@@ -359,16 +373,19 @@ class MSCOCOLabeler:
 
 
     def __get_key_from_value(self, dict, value):
-        """ 
-        """ 
+        """Find dictionary key name based on its corresponding value.""" 
         return[k for k, v in dict.items() if v == value] 
 
 
     def __get_all_armature_annotation(self):
-        """ 
-        update:
-        self.__armature_annotation_list
-        data_type : [[armature_obj_1, bbox_value_dict, keypoint_value_dict],[armature_obj_2, ...]]
+        """Retrieve all annotation data from virtual human objects that are visible in the camera view. 
+
+        This function will loop through all armature objects and their pose joints in attribute named "self.__keypoint_can_see_list", 
+        then calculate armature object's bounding box and pose joint's keypoint annotation information, then update 
+        those information to attribute named "self.__armature_annotation_list".
+        
+        Update format : [[armature_obj_1, bbox_value_dict, keypoint_value_dict],[armature_obj_2, ...]]
+
         """ 
         
         for data in self.__keypoint_can_see_list:
@@ -395,8 +412,7 @@ class MSCOCOLabeler:
 
 
     def __convert_to_mscoco_format(self):
-        """ 
-        """
+        """ Convert all annotation data to MSCOCO format."""
         self.__output_mscoco_json_dict = copy.deepcopy(self.__default_mscoco_json_format)
 
 
@@ -437,8 +453,7 @@ class MSCOCOLabeler:
 
 
     def __render_img_and_save_annotation(self):
-        """ 
-        """ 
+        """Render the image and generate the corresponding annotation/labeling data.""" 
         img_file_path = os.path.join(self.output_img_path,  self.__gen_img_id+".png")
         annotation_file_path = os.path.join(self.output_annotation_path,  self.__gen_img_id+".json")
 
@@ -456,8 +471,7 @@ class MSCOCOLabeler:
 
 
     def auto_labeling(self):
-        """
-        """
+        """Main process for rendering and labeling data."""
         self.__create_gen_img_id()
         self.__get_all_armature_object_in_target_obj_collections()
         self.__create_and_switch_annotation_scene()

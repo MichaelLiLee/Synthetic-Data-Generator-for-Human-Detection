@@ -22,8 +22,8 @@ class OccluderPlacementRandomizer:
     ----------
     __scene (bpy.types.Scene):  The blender scene data-block of current virtual environment.
     __camera (bpy.types.Camera): The blender camera data-block.
-    __clip_start (bpy.types.Camera): Camera near clipping distance.
-    __clip_end (bpy.types.Camera): Camera far clipping distance.
+    __clip_start (float): Camera near clipping distance.
+    __clip_end (float): Camera far clipping distance.
     num_occluder_in_scene_range (dict of str: int): The distribution of the number of occlusion objects within the blender scene.
     __num_occluder_in_scene (int): The number of occlusion objects within the blender scene.
     occluder_area (list of float): Spatial distribution area of occlusion objects.
