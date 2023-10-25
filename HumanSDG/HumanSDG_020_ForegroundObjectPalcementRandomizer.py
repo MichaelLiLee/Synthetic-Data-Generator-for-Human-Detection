@@ -135,6 +135,9 @@ class ForegroundObjectPlacementRandomizer:
         num_fg_obj = len(foreground_object_path_list)
         print("num fg obj in folder: {}".format(num_fg_obj))
 
+        # Shuffle foreground_object_path_list
+        random.shuffle(foreground_object_path_list)
+
         # Check num_foreground_object_in_scene is bigger than num_fg_obj
         if self.__num_foreground_object_in_scene >= num_fg_obj:
             # Loop importforeground object

@@ -1,2 +1,3 @@
 # Synthetic-Data-Generator-for-Human-Detection
-A synthetic data generator for human detection, which is built with Blender and Python.
+
+[![Synthetic-Data-Generator-for-Human-Detection-Intro-Video](docs/images/youtubePage.png)](https://youtu.be/knGM0dtrN8Q)
